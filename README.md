@@ -45,6 +45,4 @@ python cla_dada.py \
 
 Use smaller `K` and `nPts` on the demo set for faster runs. Paper defaults are 300 and 30.
 
-## License
 
-MIT
