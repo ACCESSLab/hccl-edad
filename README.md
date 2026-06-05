@@ -2,47 +2,53 @@
 
 Python implementation of the CLA (Cluster-Based Learning) and DADA (Data-Centric Anomaly Detection) algorithms from:
 
-> G. D'Angelo, S. Rampone, and F. Palmieri, "A Cluster-Based Multidimensional Approach for Detecting Attacks on Connected Vehicles," *IEEE Internet of Things Journal*, vol. 8, no. 16, pp. 12903–12913, Aug. 2021. [DOI: 10.1109/JIOT.2020.3032935](https://doi.org/10.1109/JIOT.2020.3032935)
+> G. D'Angelo, A. Castiglione, and F. Palmieri, "A Cluster-Based Multidimensional Approach for Detecting Attacks on Connected Vehicles," *IEEE Internet of Things Journal*, vol. 8, no. 16, pp. 12518–12527, Aug. 2021.
 
 ## Requirements
 
 ```bash
-pip install -r requirements.txt
+pip install numpy pandas scikit-learn
 ```
 
 ## Usage
 
-Train CLA on normal CAN traffic, then run DADA on a test set:
-
 ```bash
-python cla_dada.py --train path/to/train.csv --test path/to/test.csv
+python cla_dada_faithful.py --train path/to/normal.csv --test path/to/test.csv
 ```
-
-Options:
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--K` | 300 | K-means clusters per CAN ID |
-| `--nPts` | 30 | k-NN neighbours for DADA |
-| `--profiles-dir` | `profiles/` | Where to cache trained profiles |
-| `--no-cache` | off | Force retraining |
+| `--K` | 300 | K-means clusters per CAN ID (paper default) |
+| `--nPts` | 30 | k-NN neighbours in DADA (paper default) |
+| `--profiles-dir` | `profiles/` | Directory to cache trained CLA profiles |
+| `--no-plots` | off | Skip confusion matrix and bar chart output |
 
-### Input CSV format
+### Input format
 
-Required columns: `arbitration_id`, `data0` … `data7`.
+Required columns: `arbitration_id`, `data0`–`data7`.  
+Optional label column (any one): `label` (0/1 or R/T), `Flag`, or `Attack_Type`.  
+Byte values may be decimal or hex strings (`0xff`, `ff`).
 
-Optional label columns (any one): `label` (0/1 or R/T), `Flag`, or `Attack_Type`.
+## results
 
-## Synthetic data demo
-
+**SONATA flooding:**
 ```bash
-python generate_synthetic_data.py
-python cla_dada.py \
-  --train data/synthetic/train_normal.csv \
-  --test data/synthetic/test_mixed.csv \
-  --K 20 --nPts 10 --no-cache
+python cla_dada_faithful.py \
+  --train data/FreeDrivingData_20180323_SONATA.csv \
+  --test  data/Flooding_dataset_SONATA.csv
 ```
 
-Use smaller `K` and `nPts` on the demo set for faster runs. Paper defaults are 300 and 30.
+**GEM-CAN** 
+```bash
+python cla_dada_faithful.py \
+  --train data/GEM_Normal_Driving.csv \
+  --test  data/GEM_Attack.csv
+```
 
+## Results
+
+| Dataset | Accuracy | Recall | FPR | TP / TN / FP / FN |
+|---------|----------|--------|-----|-------------------|
+| SONATA  | 95.91%   | 100%   | 5.23% | 32,422 / 111,069 / 6,121 / 0 |
+| GEM     | 98.67%   | 100%   | 55.63% | 42,405 / 403 / 578 / 0 |
 
