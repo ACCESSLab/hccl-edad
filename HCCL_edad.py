@@ -1,8 +1,8 @@
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-HCCL Clustering-Based Detection Module
+HCCL Clustering-Based Detection Module 
+
 """
 
 import os
